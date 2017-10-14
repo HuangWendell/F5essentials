@@ -1,0 +1,55 @@
+#copy the script to F5 load-balance 
+scp F5_pooladd.sh root@F5_IP_addr:/config 
+
+#login a F5 and appended  a execute to the shell
+chmod +x F5_pooladd.sh 
+#exec the script
+./F5_pooladd.sh 
+
+#for example:
+[root@test:Active:Standalone] config # chmod +x F5_pooladd.sh
+[root@test:Active:Standalone] config # ./F5_pooladd.sh
+Please input your pool name:NEW
+Createing your poolname,NEW is created
+ Appending a monitor to the pool's memebers,Just make a choice!
+	The next is the monitor types you can use:
+	gateway_icmp|http_head_f5|https_443|inband|ntp|tcp_half_open	http|https|https_head_f5|none|tcp|udp
+Please select a monitor:tcp
+tcp Monitor is successfully added!
+****************************************************************************************************
+ Appending a load-balancing-method for the pool,just make a choice:
+	The next is the load-balancing-mthod types you can use:(default is round-robin)
+	least-connections-member|dynamic-ratio-member|fastest-app-response	least-sessions|observed-member|predictive-member|ratio-member
+Please select a load-balancing-mthod:
+round-robin LB_mthod for the NEW pool is successfully added!
+****************************************************************************************************
+Please input your ip range:192.168.1.1 192.168.1.2
+****************************************************************************************************
+Please input your Port range:80 80
+****************************************************************************************************
+
+---------------------------------------------------------------------
+Ltm::Pool: NEW
+---------------------------------------------------------------------
+Status
+  Availability : available
+  State        : enabled
+  Reason       : The pool is available
+  Monitor      : tcp
+[root@test:Active:Standalone] config #
+[root@test:Active:Standalone] config # tmsh list ltm pool NEW
+ltm pool NEW {
+    members {
+        192.168.1.1:http {
+            address 192.168.1.1
+            session monitor-enabled
+            state up
+        }
+        192.168.1.2:http {
+            address 192.168.1.2
+            session monitor-enabled
+            state down
+        }
+    }
+    monitor tcp
+}
